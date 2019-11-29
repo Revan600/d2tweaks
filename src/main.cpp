@@ -52,11 +52,11 @@ bool does_cube_window_open() {
 
 void init_log() {
 	const auto console_err = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
-	const auto logPath = "easylife.log";
+	const auto logPath = "item_mover.log";
 	const auto file = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logPath);
 
 	// ReSharper disable once CppSmartPointerVsMakeFunction
-	auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("easylife", { file, console_err }));
+	auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("item_mover", { file, console_err }));
 
 	logger->flush_on(spdlog::level::trace);
 
@@ -149,13 +149,12 @@ int32_t __fastcall item_click(unit* playerUnit, inventory* inventory, int mouse_
 	const auto itemx = (mouse_x - coefx1) / coefx2;
 	const auto itemy = (mouse_y - coefy1) / coefy2;
 
-	unit* clickedItem = nullptr;
 	unit* cubeItem = nullptr;
 
 	uint32_t px, py;
 
 	const auto currentInventoryIndex = get_inventory_index(player, page, *reinterpret_cast<int*>(0x6FBA77C4));
-	clickedItem = get_item_at_cell(player->inventory, itemx, itemy, &px, &py, currentInventoryIndex, page);
+	const auto clickedItem = get_item_at_cell(player->inventory, itemx, itemy, &px, &py, currentInventoryIndex, page);
 
 	for (auto item = player->inventory->pt_first_item; item != nullptr; item = item->item_data->pt_next_item) {
 		if (item->txt_file_no == 561) { //Cube
