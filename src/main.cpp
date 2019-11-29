@@ -19,14 +19,16 @@ game** g_game_ptr = reinterpret_cast<game**>(d2_client + 0x107834);
 
 unit* (__stdcall* get_player)();
 
-static d2_func_std_import<int32_t(unit * item, char page, int a3)> get_unk_stat_offset(10409, d2_common);
+static d2_func_std_import<int32_t(unit * item, char page, BOOL lod)> get_inventory_index(10409, d2_common);
+static d2_func_std_import<BOOL(inventory * inv, unit * item, BOOL isClient)> inv_update_item(10242, d2_common);
 static d2_func_std_import < uint32_t(inventory * inv, unit * item, uint32_t x, uint32_t y,
-	uint32_t unkStatOffset, unit * *lastBlockingUnit, uint32_t * lastBlockingUnitIndex, uint8_t page)> can_put_into_slot(
+	uint32_t invIndex, unit * *lastBlockingUnit, uint32_t * lastBlockingUnitIndex, uint8_t page)> can_put_into_slot(
 		10247, d2_common);
 static d2_func_std_import<BOOL(inventory * inv, unit * item, uint32_t x, uint32_t y,
-	uint32_t unkStatOffset, BOOL isClient, uint8_t page)> inv_add_item(
+	uint32_t invIndex, BOOL isClient, uint8_t page)> inv_add_item(
 		10249, d2_common);
-static d2_func_std_import<BOOL(inventory * inv, unit * item, BOOL isClient)> inv_update_item(10242, d2_common);
+static d2_func_std_import<unit * (::inventory * inv, uint32_t cellx, uint32_t celly, uint32_t * pcellx, uint32_t * pcelly,
+	int32_t invIndex, uint8_t page)> get_item_at_cell(10252, d2_common);
 
 bool is_only_inventory_open() {
 	return *reinterpret_cast<int32_t*>(d2_client + 0x11A6AC) > 0;
@@ -106,7 +108,7 @@ unit* get_net_unit(unit* localUnit) {
 	return result;
 }
 
-bool find_free_space(inventory* inv, unit* item, int32_t statOffset, char page, uint32_t& x, uint32_t& y) {
+bool find_free_space(inventory* inv, unit* item, int32_t inventoryIndex, char page, uint32_t& x, uint32_t& y) {
 	//15x15 max page size because I'm too lazy to implement proper page size fetching
 	const auto mx = 15;
 	const auto my = 15;
@@ -116,7 +118,7 @@ bool find_free_space(inventory* inv, unit* item, int32_t statOffset, char page, 
 			unit* blockingUnit = nullptr;
 			uint32_t blockingUnitIndex = 0;
 
-			if (can_put_into_slot(inv, item, x, y, statOffset, &blockingUnit, &blockingUnitIndex, page))
+			if (can_put_into_slot(inv, item, x, y, inventoryIndex, &blockingUnit, &blockingUnitIndex, page))
 				return true;
 		}
 	}
@@ -146,13 +148,16 @@ int32_t __fastcall item_click(unit* playerUnit, inventory* inventory, int mouse_
 	unit* clickedItem = nullptr;
 	unit* cubeItem = nullptr;
 
+	uint32_t px, py;
+
+	const auto currentInventoryIndex = get_inventory_index(player, page, *reinterpret_cast<int*>(0x6FBA77C4));
+	clickedItem = get_item_at_cell(player->inventory, itemx, itemy, &px, &py, currentInventoryIndex, page);
+
 	for (auto item = player->inventory->pt_first_item; item != nullptr; item = item->item_data->pt_next_item) {
 		if (item->txt_file_no == 561) { //Cube
 			cubeItem = item;
+			break;
 		}
-
-		if (item->item_data->page == page && item->path->x == itemx && item->path->y == itemy)
-			clickedItem = item;
 	}
 
 	if (clickedItem == nullptr || cubeItem == nullptr)
@@ -169,19 +174,19 @@ int32_t __fastcall item_click(unit* playerUnit, inventory* inventory, int mouse_
 	if (!netPlayer || !netItem)
 		return g_item_click_original(playerUnit, inventory, mouse_x, mouse_y, flag, a6, page);
 
-	const auto netStatOffset = get_unk_stat_offset(netPlayer, targetPage, *reinterpret_cast<int*>(0x6FBA77C4));
-	const auto statOffset = get_unk_stat_offset(player, targetPage, *reinterpret_cast<int*>(0x6FBA77C4));
+	const auto netInventoryIndex = get_inventory_index(netPlayer, targetPage, *reinterpret_cast<int*>(0x6FBA77C4));
+	const auto inventoryIndex = get_inventory_index(player, targetPage, *reinterpret_cast<int*>(0x6FBA77C4));
 
 	uint32_t tx, ty;
 
-	if (!find_free_space(player->inventory, clickedItem, statOffset, targetPage, tx, ty))
+	if (!find_free_space(player->inventory, clickedItem, inventoryIndex, targetPage, tx, ty))
 		return g_item_click_original(playerUnit, inventory, mouse_x, mouse_y, flag, a6, page);
 
 	netItem->item_data->page = targetPage;
 	clickedItem->item_data->page = targetPage;
 
-	inv_add_item(netPlayer->inventory, netItem, tx, ty, netStatOffset, true, netItem->item_data->page);
-	inv_add_item(player->inventory, clickedItem, tx, ty, statOffset, true, clickedItem->item_data->page);
+	inv_add_item(netPlayer->inventory, netItem, tx, ty, netInventoryIndex, true, netItem->item_data->page);
+	inv_add_item(player->inventory, clickedItem, tx, ty, inventoryIndex, true, clickedItem->item_data->page);
 
 	inv_update_item(netPlayer->inventory, netItem, true);
 	inv_update_item(player->inventory, clickedItem, true);
