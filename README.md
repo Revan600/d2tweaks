@@ -1,1 +1,1 @@
-Diablo-II-Item-Mover
+Should be loaded through PlugY's DllToLoad feature
