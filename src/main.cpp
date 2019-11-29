@@ -29,6 +29,10 @@ static d2_func_std_import<BOOL(inventory * inv, unit * item, uint32_t x, uint32_
 		10249, d2_common);
 static d2_func_std_import<unit * (::inventory * inv, uint32_t cellx, uint32_t celly, uint32_t * pcellx, uint32_t * pcelly,
 	int32_t invIndex, uint8_t page)> get_item_at_cell(10252, d2_common);
+static d2_func_std_import<items_line * (uint32_t id)> get_item_record(10600, d2_common);
+
+static d2_func_fast<void(uint32_t soundId, unit * u, uint32_t ticks, BOOL prePick, uint32_t cache)>
+play_sound(reinterpret_cast<void*>(0x6FB55820), nullptr);
 
 bool is_only_inventory_open() {
 	return *reinterpret_cast<int32_t*>(d2_client + 0x11A6AC) > 0;
@@ -190,6 +194,13 @@ int32_t __fastcall item_click(unit* playerUnit, inventory* inventory, int mouse_
 
 	inv_update_item(netPlayer->inventory, netItem, true);
 	inv_update_item(player->inventory, clickedItem, true);
+
+	const auto itemRecord = get_item_record(clickedItem->txt_file_no);
+
+	if (itemRecord != nullptr)
+		play_sound(itemRecord->wdropsound, nullptr, 0, 0, 0);
+	else
+		play_sound(4, nullptr, 0, 0, 0);
 
 	return g_item_click_original(playerUnit, inventory, mouse_x, mouse_y, flag, a6, page);
 }
