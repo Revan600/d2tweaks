@@ -15,7 +15,7 @@ char* d2_client = reinterpret_cast<char*>(GetModuleHandle("d2client.dll"));
 char* d2_common = reinterpret_cast<char*>(GetModuleHandle("d2common.dll"));
 char* d2_game = reinterpret_cast<char*>(GetModuleHandle("d2game.dll"));
 
-game** g_game_ptr = reinterpret_cast<game**>(d2_game + 0x1157FC);
+game** g_game_ptr = reinterpret_cast<game**>(d2_client + 0x107834);
 
 unit* (__stdcall* get_player)();
 
@@ -82,19 +82,28 @@ char get_target_page(char currentPage) {
 //Somehow, local (I don't know how to call them properly) units doesn't seem to have pointer to game structure
 //it looks like they are some kind of facades or just clientside dummies (need further investigation)
 unit* get_net_unit(unit* localUnit) {
+	if (localUnit == nullptr)
+		return nullptr;
+
 	auto pGame = *g_game_ptr;
+	auto typeIndex = localUnit->unit_type;
 
-	for (size_t i = 0; i < 0xA00; i++) {
-		if (pGame->units[i] == nullptr)
-			continue;
+	if (localUnit->unit_type == 3)
+		typeIndex = 4;
 
-		if (pGame->units[i]->unit_type == localUnit->unit_type &&
-			pGame->units[i]->item_num == localUnit->item_num) {
-			return pGame->units[i];
-		}
+	if (localUnit->unit_type == 4)
+		typeIndex = 3;
+
+	const auto unitCount = pGame->unit_counts[localUnit->unit_type];
+	const auto index = localUnit->item_num & 127;
+
+	auto result = pGame->unit_list[typeIndex][index];
+
+	while (result != nullptr && result->item_num != localUnit->item_num) {
+		result = result->unit1;
 	}
 
-	return nullptr;
+	return result;
 }
 
 bool find_free_space(inventory* inv, unit* item, int32_t statOffset, char page, uint32_t& x, uint32_t& y) {
@@ -151,11 +160,14 @@ int32_t __fastcall item_click(unit* playerUnit, inventory* inventory, int mouse_
 
 	const auto targetPage = get_target_page(page);
 
-	if(targetPage == 0x03 && clickedItem == cubeItem)
+	if (targetPage == 0x03 && clickedItem == cubeItem)
 		return g_item_click_original(playerUnit, inventory, mouse_x, mouse_y, flag, a6, page);
 
 	const auto netPlayer = get_net_unit(player);
 	const auto netItem = get_net_unit(clickedItem);
+
+	if (!netPlayer || !netItem)
+		return g_item_click_original(playerUnit, inventory, mouse_x, mouse_y, flag, a6, page);
 
 	const auto netStatOffset = get_unk_stat_offset(netPlayer, targetPage, *reinterpret_cast<int*>(0x6FBA77C4));
 	const auto statOffset = get_unk_stat_offset(player, targetPage, *reinterpret_cast<int*>(0x6FBA77C4));
