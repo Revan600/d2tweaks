@@ -31,6 +31,8 @@ static d2_func_std_import<unit * (::inventory * inv, uint32_t cellx, uint32_t ce
 	int32_t invIndex, uint8_t page)> get_item_at_cell(10252, d2_common);
 static d2_func_std_import<items_line * (uint32_t id)> get_item_record(10600, d2_common);
 
+static d2_func_fast<void(game*, unit*, uint32_t)>update_inventory_items(reinterpret_cast<void*>(0x6FC44A90), nullptr);
+
 static d2_func_fast<void(uint32_t soundId, unit * u, uint32_t ticks, BOOL prePick, uint32_t cache)>
 play_sound(reinterpret_cast<void*>(0x6FB55820), nullptr);
 
@@ -193,6 +195,11 @@ int32_t __fastcall item_click(unit* playerUnit, inventory* inventory, int mouse_
 
 	inv_update_item(netPlayer->inventory, netItem, true);
 	inv_update_item(player->inventory, clickedItem, true);
+
+	const auto pGame = *g_game_ptr;
+
+	update_inventory_items(pGame, netPlayer, 0);
+	update_inventory_items(pGame, player, 0);
 
 	const auto itemRecord = get_item_record(clickedItem->txt_file_no);
 
