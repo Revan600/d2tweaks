@@ -40,6 +40,28 @@ namespace details {
 	};
 
 	template<typename TRet, typename... Args>
+	class d2_func_fast_import_ {
+		void* m_base;
+		void* m_function_ptr;
+		uint32_t m_ordinal;
+	public:
+		explicit d2_func_fast_import_(uint32_t ordinal, void* base) {
+			m_base = base;
+			m_function_ptr = nullptr;
+			m_ordinal = ordinal;
+		}
+
+		TRet operator()(Args... args) {
+			if (!m_function_ptr) {
+				m_function_ptr = reinterpret_cast<decltype(m_function_ptr)>(GetProcAddress(reinterpret_cast<HMODULE>(m_base),
+																						   reinterpret_cast<LPCSTR>(m_ordinal)));
+			}
+
+			return reinterpret_cast<TRet(__fastcall*)(Args...)>(m_function_ptr)(args...);
+		}
+	};
+
+	template<typename TRet, typename... Args>
 	class d2_func_fast_ {
 		void* m_function_ptr;
 	public:
@@ -82,6 +104,15 @@ template<typename TRet, typename... Args>
 class d2_func_std_import<TRet(Args...)> : public details::d2_func_std_import_<TRet, Args...> {
 public:
 	d2_func_std_import(uint32_t ordinal, void* base) : d2_func_std_import_(ordinal, base) {};
+};
+
+template<typename TRet>
+class d2_func_fast_import {};
+
+template<typename TRet, typename... Args>
+class d2_func_fast_import<TRet(Args...)> : public details::d2_func_fast_import_<TRet, Args...> {
+public:
+	d2_func_fast_import(uint32_t ordinal, void* base) : d2_func_fast_import_(ordinal, base) {};
 };
 
 template<typename TRet>

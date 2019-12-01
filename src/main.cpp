@@ -8,33 +8,26 @@
 
 #include <memory>
 
-#include <d2common.h>
-#include <d2function.h>
+#include <common/d2common.h>
+#include <common/d2function.h>
+#include <common/d2protocol.h>
+
+#include <common.h>
+#include <server.h>
+#include <client.h>
 
 char* d2_client = reinterpret_cast<char*>(GetModuleHandle("d2client.dll"));
 char* d2_common = reinterpret_cast<char*>(GetModuleHandle("d2common.dll"));
 char* d2_game = reinterpret_cast<char*>(GetModuleHandle("d2game.dll"));
+char* d2_net = reinterpret_cast<char*>(GetModuleHandle("d2net.dll"));
 
-game** g_game_ptr = reinterpret_cast<game**>(d2_client + 0x107834);
-
-unit* (__stdcall* get_player)();
+static d2_func_fast<void(void*, size_t)> send_to_server(reinterpret_cast<void*>(0xD850), d2_client);
+static d2_func_std_import<int32_t(int32_t queue, void*, size_t)> net_send_to_server(10005, d2_net);
 
 static d2_func_std_import<int32_t(unit * item, char page, BOOL lod)> get_inventory_index(10409, d2_common);
-static d2_func_std_import<BOOL(inventory * inv, unit * item, BOOL isClient)> inv_update_item(10242, d2_common);
-static d2_func_std_import < uint32_t(inventory * inv, unit * item, uint32_t x, uint32_t y,
-	uint32_t invIndex, unit * *lastBlockingUnit, uint32_t * lastBlockingUnitIndex, uint8_t page)> can_put_into_slot(
-		10247, d2_common);
-static d2_func_std_import<BOOL(inventory * inv, unit * item, uint32_t x, uint32_t y,
-	uint32_t invIndex, BOOL isClient, uint8_t page)> inv_add_item(
-		10249, d2_common);
 static d2_func_std_import<unit * (::inventory * inv, uint32_t cellx, uint32_t celly, uint32_t * pcellx, uint32_t * pcelly,
 	int32_t invIndex, uint8_t page)> get_item_at_cell(10252, d2_common);
 static d2_func_std_import<items_line * (uint32_t id)> get_item_record(10600, d2_common);
-
-static d2_func_fast<void(game*, unit*, uint32_t)>update_inventory_items(reinterpret_cast<void*>(0x6FC44A90), nullptr);
-
-static d2_func_fast<void(uint32_t soundId, unit * u, uint32_t ticks, BOOL prePick, uint32_t cache)>
-play_sound(reinterpret_cast<void*>(0x6FB55820), nullptr);
 
 bool is_only_inventory_open() {
 	return *reinterpret_cast<int32_t*>(d2_client + 0x11A6AC) > 0;
@@ -87,59 +80,20 @@ char get_target_page(char currentPage) {
 	return 0;
 }
 
-//Somehow, local (I don't know how to call them properly) units doesn't seem to have pointer to game structure
-//it looks like they are some kind of facades or just clientside dummies (need further investigation)
-unit* get_net_unit(unit* localUnit) {
-	if (localUnit == nullptr)
-		return nullptr;
+void request_item_move(unit* item, char targetPage) {
+	static d2_protocol::item_move_cs packet;
 
-	auto pGame = *g_game_ptr;
-	auto typeIndex = localUnit->unit_type;
-
-	if (localUnit->unit_type == 3)
-		typeIndex = 4;
-
-	if (localUnit->unit_type == 4)
-		typeIndex = 3;
-
-	const auto unitCount = pGame->unit_counts[localUnit->unit_type];
-	const auto index = localUnit->item_num & 127;
-
-	auto result = pGame->unit_list[typeIndex][index];
-
-	while (result != nullptr && result->item_num != localUnit->item_num) {
-		result = result->unit1;
-	}
-
-	return result;
+	packet.item_guid = item->item_num;
+	packet.target_page = targetPage;
+	send_to_server(&packet, sizeof packet);
 }
 
-bool find_free_space(inventory* inv, unit* item, int32_t inventoryIndex, char page, uint32_t& x, uint32_t& y) {
-	//15x15 max page size because I'm too lazy to implement proper page size fetching
-	const auto mx = 15;
-	const auto my = 15;
-
-	for (x = 0; x < mx; x++) {
-		for (y = 0; y < my; y++) {
-			unit* blockingUnit = nullptr;
-			uint32_t blockingUnitIndex = 0;
-
-			if (can_put_into_slot(inv, item, x, y, inventoryIndex, &blockingUnit, &blockingUnitIndex, page))
-				return true;
-		}
-	}
-
-	return false;
-}
-
-int32_t __fastcall item_click(unit* playerUnit, inventory* inventory, int mouse_x, int mouse_y, uint8_t flag, char* a6, unsigned int page) {
+int32_t __fastcall item_click(unit* player, inventory* inventory, int mouse_x, int mouse_y, uint8_t flag, char* a6, unsigned int page) {
 	if ((static_cast<uint16_t>(GetAsyncKeyState(VK_CONTROL)) >> 8 & 0x80u) == 0)
-		return g_item_click_original(playerUnit, inventory, mouse_x, mouse_y, flag, a6, page);
+		return g_item_click_original(player, inventory, mouse_x, mouse_y, flag, a6, page);
 
 	if (!does_cube_window_open() && !does_stash_window_open())
-		return g_item_click_original(playerUnit, inventory, mouse_x, mouse_y, flag, a6, page);
-
-	const auto player = get_player();
+		return g_item_click_original(player, inventory, mouse_x, mouse_y, flag, a6, page);
 
 	//code below taken from IDA directly, so that's why it is so ugly
 	const auto coefx1 = *(reinterpret_cast<uint32_t*>(a6) + 1);
@@ -155,61 +109,35 @@ int32_t __fastcall item_click(unit* playerUnit, inventory* inventory, int mouse_
 
 	uint32_t px, py;
 
-	const auto currentInventoryIndex = get_inventory_index(player, page, *reinterpret_cast<int*>(0x6FBA77C4));
+	const auto currentInventoryIndex = get_inventory_index(player, page, *reinterpret_cast<int*>(d2_client + 0x1077C4));
 	const auto clickedItem = get_item_at_cell(player->inventory, itemx, itemy, &px, &py, currentInventoryIndex, page);
 
 	for (auto item = player->inventory->pt_first_item; item != nullptr; item = item->item_data->pt_next_item) {
-		if (item->txt_file_no == 561) { //Cube
+		auto record = get_item_record(item->txt_file_no);
+
+		if (record->szcode[0] == 'b' &&
+			record->szcode[1] == 'o' &&
+			record->szcode[2] == 'x') { //Cube
 			cubeItem = item;
 			break;
 		}
 	}
 
 	if (clickedItem == nullptr || cubeItem == nullptr)
-		return g_item_click_original(playerUnit, inventory, mouse_x, mouse_y, flag, a6, page);
+		return g_item_click_original(player, inventory, mouse_x, mouse_y, flag, a6, page);
 
 	const auto targetPage = get_target_page(page);
 
 	if (targetPage == 0x03 && clickedItem == cubeItem)
-		return g_item_click_original(playerUnit, inventory, mouse_x, mouse_y, flag, a6, page);
+		return g_item_click_original(player, inventory, mouse_x, mouse_y, flag, a6, page);
 
-	const auto netPlayer = get_net_unit(player);
-	const auto netItem = get_net_unit(clickedItem);
-
-	if (!netPlayer || !netItem)
-		return g_item_click_original(playerUnit, inventory, mouse_x, mouse_y, flag, a6, page);
-
-	const auto netInventoryIndex = get_inventory_index(netPlayer, targetPage, *reinterpret_cast<int*>(0x6FBA77C4));
-	const auto inventoryIndex = get_inventory_index(player, targetPage, *reinterpret_cast<int*>(0x6FBA77C4));
-
-	uint32_t tx, ty;
-
-	if (!find_free_space(player->inventory, clickedItem, inventoryIndex, targetPage, tx, ty))
-		return g_item_click_original(playerUnit, inventory, mouse_x, mouse_y, flag, a6, page);
-
-	netItem->item_data->page = targetPage;
-	clickedItem->item_data->page = targetPage;
-
-	inv_add_item(netPlayer->inventory, netItem, tx, ty, netInventoryIndex, true, netItem->item_data->page);
-	inv_add_item(player->inventory, clickedItem, tx, ty, inventoryIndex, true, clickedItem->item_data->page);
-
-	inv_update_item(netPlayer->inventory, netItem, true);
-	inv_update_item(player->inventory, clickedItem, true);
-
-	const auto pGame = *g_game_ptr;
-
-	update_inventory_items(pGame, netPlayer, 0);
-	update_inventory_items(pGame, player, 0);
-
-	const auto itemRecord = get_item_record(clickedItem->txt_file_no);
-
-	if (itemRecord != nullptr)
-		play_sound(itemRecord->wdropsound, nullptr, 0, 0, 0);
-	else
-		play_sound(4, nullptr, 0, 0, 0);
-
-	return g_item_click_original(playerUnit, inventory, mouse_x, mouse_y, flag, a6, page);
+	request_item_move(clickedItem, targetPage);
+	return 0;
 }
+
+static item_mover::common g_common;
+static item_mover::server g_server;
+static item_mover::client g_client;
 
 extern "C" {
 	// ReSharper disable once CppInconsistentNaming
@@ -225,7 +153,9 @@ extern "C" {
 
 		MH_CreateHook(d2_client + 0x475C0, item_click, reinterpret_cast<void**>(&g_item_click_original));
 
-		get_player = reinterpret_cast<decltype(get_player)>(d2_client + 0x883D0);
+		g_common.init();
+		g_server.init(&g_common);
+		g_client.init();
 
 		MH_EnableHook(nullptr);
 	}

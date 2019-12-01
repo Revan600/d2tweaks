@@ -20,6 +20,23 @@ struct skills;
 struct cb_player_data;
 struct cb_item_data;
 struct objects_bin;
+struct unit;
+
+struct client_packet_buffer {
+	char data[1976];
+	int32_t data_size;
+};
+
+struct packet_wrapper_sc {
+	char data[516];
+	int32_t data_size;
+	int32_t receive_time;
+	packet_wrapper_sc* next;
+};
+
+struct client_unit_list {
+	unit* unit_list[5][128]; //0x1120
+};
 
 struct unit {										//Offset from Code.		Size: 0xF4+4
 	uint32_t		unit_type;				//+00
