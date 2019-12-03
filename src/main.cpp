@@ -16,6 +16,13 @@
 #include <server.h>
 #include <client.h>
 
+//Uncomment on of the defines that corresponds to your mod loader
+//#define PLUGY
+//OR
+//#define D2_MOD
+
+#include <loader.h>
+
 char* d2_client = reinterpret_cast<char*>(GetModuleHandle("d2client.dll"));
 char* d2_common = reinterpret_cast<char*>(GetModuleHandle("d2common.dll"));
 char* d2_game = reinterpret_cast<char*>(GetModuleHandle("d2game.dll"));
@@ -140,25 +147,24 @@ static item_mover::server g_server;
 static item_mover::client g_client;
 
 extern "C" {
-	// ReSharper disable once CppInconsistentNaming
-	__declspec(dllexport) void __stdcall Init() {
+	EP_HEADER
 		init_log();
 
-		if (MH_Initialize() != MH_OK) {
-			MessageBox(nullptr, "Cannot initialize hook system!", "Error", MB_OK | MB_ICONSTOP);
-			exit(0);
-		}
-
-		spdlog::debug("item_click: {0}", static_cast<void*>(d2_client + 0x475C0));
-
-		MH_CreateHook(d2_client + 0x475C0, item_click, reinterpret_cast<void**>(&g_item_click_original));
-
-		g_common.init();
-		g_server.init(&g_common);
-		g_client.init();
-
-		MH_EnableHook(nullptr);
+	if (MH_Initialize() != MH_OK) {
+		MessageBox(nullptr, "Cannot initialize hook system!", "Error", MB_OK | MB_ICONSTOP);
+		exit(0);
 	}
+
+	spdlog::debug("item_click: {0}", static_cast<void*>(d2_client + 0x475C0));
+
+	MH_CreateHook(d2_client + 0x475C0, item_click, reinterpret_cast<void**>(&g_item_click_original));
+
+	g_common.init();
+	g_server.init(&g_common);
+	g_client.init();
+
+	MH_EnableHook(nullptr);
+	EP_FOOTER
 }
 
 // ReSharper disable once CppInconsistentNaming
