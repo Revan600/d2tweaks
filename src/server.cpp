@@ -122,9 +122,14 @@ unit* item_mover::server::get_server_unit(game* game, uint32_t guid, uint32_t ty
 
 bool item_mover::server::find_free_space(inventory* inv, unit* item, int32_t inventoryIndex, char page, uint32_t& x,
 										 uint32_t& y) {
-	//15x15 max page size because I'm too lazy to implement proper page size fetching
-	const auto mx = 15;
-	const auto my = 15;
+	static d2_func_std_import<void* (int32_t index, int32_t zero, char* data)> get_inv_data(10636, d2_common);
+
+	char data[0x18];
+
+	get_inv_data(inventoryIndex, 0, data);
+
+	const auto mx = static_cast<uint32_t>(data[0]);
+	const auto my = static_cast<uint32_t>(data[1]);
 
 	for (x = 0; x < mx; x++) {
 		for (y = 0; y < my; y++) {
