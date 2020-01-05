@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<interface>
+  <menu name="autosort" x="0" y="0" width="-1" height="-1">
+    <button name="m_sort_inventory_btn" x="678" y="478" width="32" height="32" image="d2tweaks\assets\buttons" frameDown="1" frameUp="0" clickSound="4" popup="Sort inventory"/>
+    <button name="m_sort_stash_btn" x="312" y="476" width="32" height="32" image="d2tweaks\assets\buttons" frameDown="1" frameUp="0" clickSound="4" popup="Sort stash"/>
+    <button name="m_sort_cube_btn" x="100" y="476" width="32" height="32" image="d2tweaks\assets\buttons" frameDown="1" frameUp="0" clickSound="4" popup="Sort cube"/>
+  </menu>
+</interface>

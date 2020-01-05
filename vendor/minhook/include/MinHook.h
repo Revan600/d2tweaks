@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  MinHook - The Minimalistic API Hooking Library for x64/x86
  *  Copyright (C) 2009-2017 Tsuda Kageyu.
  *  All rights reserved.
@@ -112,9 +112,9 @@ extern "C" {
 
     // Creates a Hook for the specified API function, in disabled state.
     // Parameters:
-    //   pszModule  [in]  A pointer to the loaded module name which contains the
+    //   pszModule  [in]  A pointer to the loaded module get_name which contains the
     //                    target function.
-    //   pszTarget  [in]  A pointer to the target function name, which will be
+    //   pszTarget  [in]  A pointer to the target function get_name, which will be
     //                    overridden by the detour function.
     //   pDetour    [in]  A pointer to the detour function, which will override
     //                    the target function.
@@ -126,9 +126,9 @@ extern "C" {
 
     // Creates a Hook for the specified API function, in disabled state.
     // Parameters:
-    //   pszModule  [in]  A pointer to the loaded module name which contains the
+    //   pszModule  [in]  A pointer to the loaded module get_name which contains the
     //                    target function.
-    //   pszTarget  [in]  A pointer to the target function name, which will be
+    //   pszTarget  [in]  A pointer to the target function get_name, which will be
     //                    overridden by the detour function.
     //   pDetour    [in]  A pointer to the detour function, which will override
     //                    the target function.
@@ -177,7 +177,7 @@ extern "C" {
     // Applies all queued changes in one go.
     MH_STATUS WINAPI MH_ApplyQueued(VOID);
 
-    // Translates the MH_STATUS to its name as a string.
+    // Translates the MH_STATUS to its get_name as a string.
     const char * WINAPI MH_StatusToString(MH_STATUS status);
 
 #ifdef __cplusplus

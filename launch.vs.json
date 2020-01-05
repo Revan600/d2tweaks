@@ -1,0 +1,13 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "dll",
+      "exe": "D:\\Games\\Diablo II\\D2SE.exe",
+      "project": "CMakeLists.txt",
+      "projectTarget": "d2tweaks.dll (D:\\Games\\Diablo II\\MODS\\test\\d2tweaks.dll)",
+      "name": "Diablo II"
+    }
+  ]
+}

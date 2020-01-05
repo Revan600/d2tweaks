@@ -853,7 +853,7 @@ MH_STATUS WINAPI MH_CreateHookApiEx(
 }
 
 //-------------------------------------------------------------------------
-MH_STATUS WINAPI MH_CreateHookApi(
+MH_STATUS WINAPI hookApi(
     LPCWSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal)
 {
    return MH_CreateHookApiEx(pszModule, pszProcName, pDetour, ppOriginal, NULL);
