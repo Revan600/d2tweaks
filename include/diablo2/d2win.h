@@ -7,7 +7,7 @@ namespace diablo2 {
 	enum ui_color_t {
 		UI_COLOR_WHITE = 0x0,
 		UI_COLOR_RED = 0x1,
-		UI_COLOR_LIGHTGREEN = 0x2,
+		UI_COLOR_LIGHT_GREEN = 0x2,
 		UI_COLOR_BLUE = 0x3,
 		UI_COLOR_DARK_GOLD = 0x4,
 		UI_COLOR_GREY = 0x5,
@@ -15,13 +15,13 @@ namespace diablo2 {
 		UI_COLOR_GOLD = 0x7,
 		UI_COLOR_ORANGE = 0x8,
 		UI_COLOR_YELLOW = 0x9,
-		UI_COLOR_DARKGREEN = 0xA,
+		UI_COLOR_DARK_GREEN = 0xA,
 		UI_COLOR_PURPLE = 0xB,
 		UI_COLOR_GREEN = 0xC,
 		UI_COLOR_WHITE2 = 0xD,
 		UI_COLOR_BLACK2 = 0xE,
-		UI_COLOR_DARKWHITE = 0xF,
-		UI_COLOR_LIGHTGREY = 0x10,
+		UI_COLOR_DARK_WHITE = 0xF,
+		UI_COLOR_LIGHT_GREY = 0x10,
 	};
 
 	enum ui_font_t {

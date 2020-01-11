@@ -27,8 +27,16 @@ namespace d2_tweaks {
 				m_y = value;
 			}
 
+			void set_width(int32_t value) {
+				m_w = value;
+			}
+
 			int32_t get_width() const {
 				return m_w;
+			}
+
+			void set_height(int32_t value) {
+				m_h = value;
 			}
 
 			int32_t get_height() const {

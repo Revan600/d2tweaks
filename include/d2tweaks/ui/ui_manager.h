@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Windows.h>
+
 #include <fw/singleton.h>
 
 #include <vector>
@@ -23,7 +25,13 @@ namespace d2_tweaks {
 
 			void draw();
 		private:
+			static LRESULT __stdcall wnd_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 			void process_inputs();
+
+			bool process_left_mouse(bool up);
+			bool process_right_mouse(bool up);
+
+			bool process_key_event(uint32_t key, bool up);
 		};
 	}
 }

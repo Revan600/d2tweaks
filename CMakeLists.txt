@@ -15,6 +15,12 @@ file(GLOB_RECURSE sources
 
 add_library(d2tweaks SHARED ${sources})
 
+set(CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS /W3 /GR /EHsc")
+set(CMAKE_CXX_FLAGS_DEBUG "/MTd /Zi /Ob0 /Od /RTC1")
+set(CMAKE_CXX_FLAGS_MINSIZEREL "/MT /O1 /Ob1 /DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/MT /Zi /O2 /Ob1 /DNDEBUG")
+
 set(D2_BASE_DIR D:/Games/Diablo\ II/)
 
 add_compile_definitions(WIN32_LEAN_AND_MEAN)
@@ -55,5 +61,5 @@ set_target_properties(pugixml PROPERTIES
 )
 target_link_libraries(d2tweaks PRIVATE pugixml)
 
-#set_target_properties(d2tweaks PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${D2_BASE_DIR}/MODS/test/)
-set_target_properties(d2tweaks PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${D2_BASE_DIR}/MODS/Zy-El\ v.4.5.1/)
+set_target_properties(d2tweaks PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${D2_BASE_DIR}/MODS/test/)
+#set_target_properties(d2tweaks PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${D2_BASE_DIR}/MODS/Zy-El\ v.4.5.1/)

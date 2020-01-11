@@ -3,26 +3,17 @@
 #include <algorithm>
 #include <pugixml.hpp>
 
-#include <d2tweaks/ui/controls/control.h>
-
 #include <diablo2/utils/mpq_ifstream.h>
+
 #include <spdlog/spdlog.h>
+
+#include <d2tweaks/ui/controls/control.h>
 #include <d2tweaks/ui/controls/button.h>
-#include <d2tweaks/common/asset_manager.h>
-#include <codecvt>
+#include <d2tweaks/ui/controls/image.h>
+#include <d2tweaks/ui/controls/label.h>
+#include <d2tweaks/ui/controls/checkbox.h>
 
-static std::wstring string_to_wstring(const std::string& str) {
-	if (str.empty())
-		return std::wstring();
-
-	const auto sizeNeeded = MultiByteToWideChar(CP_ACP, 0, &str[0], static_cast<int>(str.size()), nullptr, 0);
-	std::wstring wstrTo(sizeNeeded, 0);
-	MultiByteToWideChar(CP_ACP, 0, &str[0], static_cast<int>(str.size()), &wstrTo[0], sizeNeeded);
-
-	return wstrTo;
-}
-
-d2_tweaks::ui::menu::menu() {}
+d2_tweaks::ui::menu::menu() : m_x(0), m_y(0), m_width(0), m_height(0) {}
 
 bool d2_tweaks::ui::menu::load_xml(const std::string& path) {
 	diablo2::utils::mpq_ifstream file(path);
@@ -43,35 +34,37 @@ bool d2_tweaks::ui::menu::load_xml(const std::string& path) {
 
 	const auto menuNode = root.first();
 
-	auto x = menuNode.node().attribute("x").as_int();
-	auto y = menuNode.node().attribute("y").as_int();
-	auto width = menuNode.node().attribute("width").as_int();
-	auto height = menuNode.node().attribute("height").as_int();
+	m_x = menuNode.node().attribute("x").as_int(0);
+	m_y = menuNode.node().attribute("y").as_int(0);
+	m_width = menuNode.node().attribute("width").as_int(-1);
+	m_height = menuNode.node().attribute("height").as_int(-1);
 
 	for (auto node : menuNode.node().children("button")) {
-		const auto cname = node.attribute("name").as_string();
-		const auto cx = node.attribute("x").as_int();
-		const auto cy = node.attribute("y").as_int();
-		const auto cw = node.attribute("width").as_int();
-		const auto ch = node.attribute("height").as_int();
+		add_control(new controls::button(node));
+	}
 
-		const auto cImgPath = node.attribute("image").as_string();
-		const auto cimg = singleton<common::asset_manager>::instance().get_mpq_file(const_cast<char*>(cImgPath), common::MPQ_FILE_TYPE_DC6);
+	for (auto node : menuNode.node().children("image")) {
+		add_control(new controls::image(node));
+	}
 
-		if (!cimg) {
-			spdlog::critical("Cannot load {0} image for {1} control!", cImgPath, cname);
-			exit(-1);
-		}
+	for (auto node : menuNode.node().children("label")) {
+		add_control(new controls::label(node));
+	}
 
-		const auto frameDown = node.attribute("frameDown").as_int();
-		const auto frameUp = node.attribute("frameUp").as_int();
-		const auto clickSound = node.attribute("clickSound").as_int(-1);
-		const auto popup = node.attribute("popup").as_string();
+	for (auto node : menuNode.node().children("checkbox")) {
+		add_control(new controls::checkbox(node));
+	}
 
-		auto btn = new controls::button(rect(cx, cy, cw, ch), {}, cimg, frameDown, frameUp, clickSound);
-		btn->set_name(cname);
-		btn->set_popup(string_to_wstring(popup));
-		add_control(btn);
+	if (m_width == -1) {
+		for (auto control : m_controls)
+			if (control->get_width() > m_width)
+				m_width = control->get_width();
+	}
+
+	if (m_height == -1) {
+		for (auto control : m_controls)
+			if (control->get_height() > m_height)
+				m_height = control->get_height();
 	}
 
 	return true;
@@ -95,14 +88,14 @@ void d2_tweaks::ui::menu::add_control(controls::control* control) {
 	m_controls.push_back(control);
 }
 
-d2_tweaks::ui::controls::control* d2_tweaks::ui::menu::get_control(const std::string& name) {
-	const auto it = m_named_controls.find(name);
-
-	if (it == m_named_controls.end())
-		return nullptr;
-
-	return it->second;
-}
+//d2_tweaks::ui::controls::control* d2_tweaks::ui::menu::get_control(const std::string& name) {
+//	const auto it = m_named_controls.find(name);
+//
+//	if (it == m_named_controls.end())
+//		return nullptr;
+//
+//	return it->second;
+//}
 
 void d2_tweaks::ui::menu::remove_control(controls::control* control) {
 	if (control == nullptr)
@@ -116,24 +109,51 @@ void d2_tweaks::ui::menu::draw() {
 		if (!control->get_visible())
 			continue;
 
-		control->draw();
+		control->draw(m_x, m_y);
 	}
 }
 
-void d2_tweaks::ui::menu::left_mouse(bool up) {
+bool d2_tweaks::ui::menu::left_mouse(bool up) {
+	auto block = false;
+
 	for (auto control : m_controls) {
 		if (!control->get_enabled())
 			continue;
 
-		control->left_mouse(up);
+		auto tblock = false;
+		control->left_mouse(m_x, m_y, up, tblock);
+		block |= tblock;
 	}
+
+	return block;
 }
 
-void d2_tweaks::ui::menu::right_mouse(bool up) {
+bool d2_tweaks::ui::menu::right_mouse(bool up) {
+	auto block = false;
+
 	for (auto control : m_controls) {
 		if (!control->get_enabled())
 			continue;
 
-		control->right_mouse(up);
+		auto tblock = false;
+		control->right_mouse(m_x, m_y, up, tblock);
+		block |= tblock;
 	}
+
+	return block;
+}
+
+bool d2_tweaks::ui::menu::key_event(uint32_t key, bool up) {
+	auto block = false;
+
+	for (auto control : m_controls) {
+		if (!control->get_enabled())
+			continue;
+
+		auto tblock = false;
+		control->key_event(m_x, m_y, key, up, tblock);
+		block |= tblock;
+	}
+
+	return block;
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 namespace hooking {
 	enum mh_status_t {
@@ -48,4 +49,8 @@ namespace hooking {
 	};
 
 	mh_status_t hook(void* target, void* detour, void** original);
+	intptr_t get_executable_memory(void* origin, size_t size);
+	void* set_call(void* address, void* function, size_t stubSize = 7);
+	void* set_jmp(void* address, void* function, size_t stubSize = 7);
+	void* get_call(void* address);
 }

@@ -77,10 +77,14 @@ BOOL APIENTRY DllMain(HMODULE moduleHandle,
 					  LPVOID reserved) {
 	// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 	switch (reason) {
+		case DLL_PROCESS_DETACH:
+		{
+			MH_Uninitialize();
+			break;
+		}
 		case DLL_PROCESS_ATTACH:
 		case DLL_THREAD_ATTACH:
 		case DLL_THREAD_DETACH:
-		case DLL_PROCESS_DETACH:
 		default:
 			break;
 	}

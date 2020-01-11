@@ -1,46 +1,42 @@
 #pragma once
 
 #include <d2tweaks/ui/controls/control.h>
-#include <d2tweaks/ui/rect.h>
-
-#include <cstdint>
-#include <functional>
 
 #include <pugixml.hpp>
-
-namespace diablo2 {
-	namespace structures {
-		struct cell_file;
-	}
-}
+#include <functional>
+#include <d2tweaks/ui/rect.h>
 
 namespace d2_tweaks {
 	namespace common {
 		class asset;
 	}
+}
 
+namespace d2_tweaks {
 	namespace ui {
 		namespace controls {
 			class image;
+			class label;
 
-			class button final : public control {
+			class checkbox : public control {
 				rect m_rect;
 				image* m_image;
-				int32_t m_frame_down;
-				int32_t m_frame_up;
-				int32_t m_click_sound;
-
-				bool m_is_down;
-				int32_t m_current_frame;
+				label* m_label;
 
 				std::wstring m_popup;
 
-				std::function<void()> m_on_click;
+				int32_t m_frame_checked;
+				int32_t m_frame_unchecked;
+				int32_t m_click_sound;
+
+				bool m_is_down;
+				bool m_state;
+
+				std::function<void(bool)> m_on_click;
 			public:
-				button(const rect& rect, const std::function<void()>& onClick,
-					   common::asset* image, int32_t frameDown, int32_t frameUp, int32_t clickSound = -1);
-				explicit button(const pugi::xml_node& node);
-				virtual ~button();
+				checkbox(const std::wstring& text, const rect& rect, const std::function<void()>& onClick,
+						 common::asset* image, int32_t frameChecked, int32_t frameUnchecked, int32_t clickSound = -1);
+				explicit checkbox(const pugi::xml_node& node);
 
 				void set_x(int32_t value) override;
 				int32_t get_x() const override {
@@ -60,12 +56,16 @@ namespace d2_tweaks {
 					m_popup = popup;
 				}
 
-				std::function<void()> get_on_click() const {
+				std::function<void(bool)> get_on_click() const {
 					return m_on_click;
 				}
 
-				void set_on_click(const std::function<void()>& on_click) {
+				void set_on_click(const std::function<void(bool)>& on_click) {
 					m_on_click = on_click;
+				}
+
+				bool get_state() const {
+					return m_state;
 				}
 
 				void draw() override;

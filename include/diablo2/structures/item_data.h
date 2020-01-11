@@ -7,9 +7,21 @@ namespace diablo2 {
 		struct inventory;
 		struct unit;
 
+		enum class item_quality_t : uint32_t{
+			ITEM_QUALITY_INFERIOR = 0x01,
+			ITEM_QUALITY_NORMAL = 0x02,
+			ITEM_QUALITY_SUPERIOR = 0x03,
+			ITEM_QUALITY_MAGIC = 0x04,
+			ITEM_QUALITY_SET = 0x05,
+			ITEM_QUALITY_RARE = 0x06,
+			ITEM_QUALITY_UNIQUE = 0x07,
+			ITEM_QUALITY_CRAFTED = 0x08,
+			ITEM_QUALITY_TEMPERED = 0x09
+		};
+
 		struct item_data {
 			//Offset from Code.
-			uint32_t quality; //+00
+			item_quality_t quality; //+00
 			uint32_t seed_low; //+04
 			uint32_t seed_hi; //+08
 			uint32_t player_id; //+0C #10734 / #10735 (PCInventory->ptPlayer->0C)

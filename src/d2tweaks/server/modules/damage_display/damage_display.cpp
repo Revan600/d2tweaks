@@ -132,11 +132,12 @@ static diablo2::structures::unit* get_pet_owner(diablo2::structures::game* game,
 		return instance.get_server_unit(game, guid, 0x00);
 
 	instance.iterate_server_units(game, 0x00, [&](diablo2::structures::unit* player) {
-		diablo2::d2_game::iterate_unit_pets(game, player,
-											[&](diablo2::structures::game*, diablo2::structures::unit*, diablo2::structures::unit* u) {
-			if (u == unit) {
-				guid = player->guid;
-			}
+		diablo2::d2_game::iterate_unit_pets(
+			game, player, [&](diablo2::structures::game*, diablo2::structures::unit*, diablo2::structures::unit* u) {
+			if (u != unit)
+				return;
+
+			guid = player->guid;
 		});
 
 		return guid == 0;
@@ -207,10 +208,6 @@ static char __fastcall apply_attack_results(diablo2::structures::game* game,
 	static auto& instance = singleton<d2_tweaks::server::server>::instance();
 
 	const auto result = g_apply_attack_results_origin(game, attacker, defender, recalculateDamage, dmg);
-	const auto owner = diablo2::d2_game::get_unit_owner(game, attacker);
-
-	auto attackerHasOwner = static_cast<bool>(attacker->flags.unit_flags_ex & 0x00000400);
-	auto defenderHasOwner = static_cast<bool>(defender->flags.unit_flags_ex & 0x00000400);
 
 	if (has_players(attacker, defender)) {
 		process_players_damage(attacker, defender, dmg);

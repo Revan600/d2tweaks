@@ -27,11 +27,11 @@ void d2_tweaks::client::client::init() {
 	hooking::hook(diablo2::d2_client::get_base() + 0x9640, game_tick, reinterpret_cast<void**>(&g_game_tick_original));
 	hooking::hook(diablo2::d2_client::get_base() + 0x5E650, draw_game_ui, reinterpret_cast<void**>(&g_draw_game_ui_original));
 
-	for (size_t i = 0; i < sizeof m_modules / sizeof(void*); i++) {
-		if (m_modules[i] == nullptr)
+	for (auto & m_module : m_modules) {
+		if (m_module == nullptr)
 			break;
 
-		m_modules[i]->init();
+		m_module->init();
 	}
 }
 
@@ -58,11 +58,11 @@ void d2_tweaks::client::client::handle_packet(common::packet_header* packet, siz
 int32_t d2_tweaks::client::client::game_tick(int32_t a1) {
 	static auto& instance = singleton<client>::instance();
 
-	for (size_t i = 0; i < sizeof instance.m_modules / sizeof(void*); i++) {
-		if (instance.m_tick_handlers[i] == nullptr)
+	for (auto & tick_handler : instance.m_tick_handlers) {
+		if (tick_handler == nullptr)
 			break;
 
-		instance.m_tick_handlers[i]->tick();
+		tick_handler->tick();
 	}
 
 	return g_game_tick_original(a1);

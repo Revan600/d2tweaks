@@ -55,6 +55,9 @@ int32_t d2_tweaks::common::asset_manager::reload() {
 }
 
 d2_tweaks::common::asset* d2_tweaks::common::asset_manager::get_mpq_file(const std::string& path, mpq_file_type_t type) {
+	if (path.empty())
+		return nullptr;
+
 	const auto it = m_assets.find(path);
 
 	if (it != m_assets.end())
