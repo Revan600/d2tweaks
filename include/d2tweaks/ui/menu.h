@@ -14,6 +14,8 @@ namespace d2_tweaks {
 			bool m_enabled = false;
 			bool m_visible = false;
 
+			std::string m_name;
+
 			int32_t m_x;
 			int32_t m_y;
 			int32_t m_width;
@@ -28,6 +30,10 @@ namespace d2_tweaks {
 
 			const std::vector<controls::control*>& get_controls() const {
 				return m_controls;
+			}
+
+			const std::string& get_name() const {
+				return m_name;
 			}
 
 			virtual bool get_enabled() const {

@@ -20,7 +20,7 @@
 static int32_t(__fastcall* g_get_incoming_packet_info_original)(d2_tweaks::common::packet_header* data, unsigned int dataSize, size_t* packetSizeOut, size_t* someOffset, int* packetGroup, int32_t* a6, int a7, int a8);
 
 static int32_t(__fastcall* g_handle_packet_original)(diablo2::structures::game* game, diablo2::structures::unit* player, d2_tweaks::common::packet_header* data, size_t size);
-static int32_t(__stdcall* g_net_tick_original)();
+static int32_t(__fastcall* g_net_tick_original)(diablo2::structures::game*, diablo2::structures::unit*, int32_t, int32_t);
 
 //returns some kind of processing type (i.e. resultGroup == 0x04 means drop packet)
 static int32_t __fastcall get_incoming_packet_info(d2_tweaks::common::packet_header* data, unsigned int dataSize, size_t* packetSizeOut, size_t* someOffset, int* packetGroup, int32_t* a6, int a7, int a8) {
@@ -64,9 +64,9 @@ d2_tweaks::server::server::server(token) {
 }
 
 void d2_tweaks::server::server::init() {
-	hooking::hook(reinterpret_cast<void*>(diablo2::d2_game::get_base() + 0x59320), ::handle_packet, reinterpret_cast<void**>(&g_handle_packet_original));
-	hooking::hook(reinterpret_cast<void*>(diablo2::d2_game::get_base() + 0x8530), net_tick, reinterpret_cast<void**>(&g_net_tick_original));
-	hooking::hook(reinterpret_cast<void*>(diablo2::d2_net::get_base() + 0x1FE0), get_incoming_packet_info, reinterpret_cast<void**>(&g_get_incoming_packet_info_original));
+	hooking::hook(reinterpret_cast<void*>(diablo2::d2_game::get_base() + 0x59320), ::handle_packet, &g_handle_packet_original);
+	hooking::hook(reinterpret_cast<void*>(diablo2::d2_game::get_base() + 0x50F80), net_tick, &g_net_tick_original);
+	hooking::hook(reinterpret_cast<void*>(diablo2::d2_net::get_base() + 0x1FE0), get_incoming_packet_info, &g_get_incoming_packet_info_original);
 
 	//disable outgoing packet type checks
 	DWORD oldProtect;
@@ -115,16 +115,16 @@ void d2_tweaks::server::server::register_packet_handler(common::message_types_t 
 	m_packet_handlers[type] = module;
 }
 
-diablo2::structures::unit* d2_tweaks::server::server::get_server_unit(diablo2::structures::game* game, uint32_t guid, uint32_t type) {
+diablo2::structures::unit* d2_tweaks::server::server::get_server_unit(diablo2::structures::game* game, uint32_t guid, diablo2::structures::unit_type_t type) {
 	if (game == nullptr)
 		return nullptr;
 
-	auto typeIndex = type;
+	auto typeIndex = static_cast<uint32_t>(type);
 
-	if (type == 3)
+	if (type == diablo2::structures::unit_type_t::UNIT_TYPE_MISSILE)
 		typeIndex = 4;
 
-	if (type == 4)
+	if (type == diablo2::structures::unit_type_t::UNIT_TYPE_ITEM)
 		typeIndex = 3;
 
 	const auto index = guid & 127;
@@ -138,7 +138,7 @@ diablo2::structures::unit* d2_tweaks::server::server::get_server_unit(diablo2::s
 	return result;
 }
 
-void d2_tweaks::server::server::iterate_server_units(diablo2::structures::game* game, uint32_t type,
+void d2_tweaks::server::server::iterate_server_units(diablo2::structures::game* game, diablo2::structures::unit_type_t type,
 													 const std::function<bool(diablo2::structures::unit*)>& cb) {
 	if (!cb)
 		return;
@@ -146,12 +146,12 @@ void d2_tweaks::server::server::iterate_server_units(diablo2::structures::game* 
 	if (!game)
 		return;
 
-	auto typeIndex = type;
+	auto typeIndex = static_cast<uint32_t>(type);
 
-	if (type == 3)
+	if (type == diablo2::structures::unit_type_t::UNIT_TYPE_MISSILE)
 		typeIndex = 4;
 
-	if (type == 4)
+	if (type == diablo2::structures::unit_type_t::UNIT_TYPE_ITEM)
 		typeIndex = 3;
 
 	for (size_t index = 0; index < 128; index++) {
@@ -160,23 +160,21 @@ void d2_tweaks::server::server::iterate_server_units(diablo2::structures::game* 
 		while (unit != nullptr) {
 			if (!cb(unit))
 				return;
-			
+
 			unit = unit->prev_unit;
 		}
 	}
 }
 
-int32_t d2_tweaks::server::server::net_tick() {
+int32_t d2_tweaks::server::server::net_tick(diablo2::structures::game* game, diablo2::structures::unit* unit, int32_t a3, int32_t a4) {
 	static auto& instance = singleton<server>::instance();
-
-	const auto result = g_net_tick_original();
 
 	for (size_t i = 0; i < sizeof instance.m_modules / sizeof(void*); i++) {
 		if (instance.m_tick_handlers[i] == nullptr)
 			break;
 
-		instance.m_tick_handlers[i]->tick();
+		instance.m_tick_handlers[i]->tick(game, unit);
 	}
 
-	return result;
+	return g_net_tick_original(game, unit, a3, a4);
 }

@@ -28,6 +28,9 @@ namespace diablo2 {
 
 		static structures::unit* get_player_pet(structures::game* game, structures::unit* unit, uint32_t type, uint32_t index);
 
+		static int32_t identify_item(structures::game* game, structures::unit* player, structures::unit* item);
+		static int32_t pickup_gold_pile(structures::game* game, structures::unit* unit, structures::unit* item);
+		
 		static structures::unit* get_unit_owner(structures::game* game, structures::unit* unit);
 		static void* iterate_unit_pets(structures::game* game, structures::unit* unit,
 									   const std::function<void(structures::game*, structures::unit*, structures::unit*)>& cb);

@@ -1,8 +1,8 @@
 #include <d2tweaks/ui/controls/label.h>
 #include <common/string_utils.h>
 
-d2_tweaks::ui::controls::label::label(const std::wstring& text, int32_t x, int32_t y, diablo2::ui_color_t color,
-									  diablo2::ui_font_t font) : control(x, y, 0, 0) {
+d2_tweaks::ui::controls::label::label(menu* menu, const std::wstring& text, int32_t x, int32_t y, diablo2::ui_color_t color,
+									  diablo2::ui_font_t font) : control(menu, x, y, 0, 0) {
 	control::set_enabled(true);
 	control::set_visible(true);
 
@@ -15,7 +15,7 @@ d2_tweaks::ui::controls::label::label(const std::wstring& text, int32_t x, int32
 	control::set_width(0);
 }
 
-d2_tweaks::ui::controls::label::label(const pugi::xml_node& node) : control(0, 0, 0, 0) {
+d2_tweaks::ui::controls::label::label(menu* menu, const pugi::xml_node& node) : control(menu, 0, 0, 0, 0) {
 	const auto cname = node.attribute("name").as_string();
 	const auto cx = node.attribute("x").as_int(0);
 	const auto cy = node.attribute("y").as_int(0);

@@ -11,7 +11,8 @@
 #include <diablo2/structures/gfxcell.h>
 #include <diablo2/d2client.h>
 
-d2_tweaks::ui::controls::image::image(common::asset* image, int32_t x, int32_t y, int32_t frame) : control(x, y, 0, 0) {
+d2_tweaks::ui::controls::image::image(menu* menu, common::asset* image, int32_t x, int32_t y, int32_t frame)
+	: control(menu, x, y, 0, 0) {
 	control::set_enabled(true);
 	control::set_visible(true);
 
@@ -26,7 +27,7 @@ d2_tweaks::ui::controls::image::image(common::asset* image, int32_t x, int32_t y
 	control::set_height(m_rect.get_height());
 }
 
-d2_tweaks::ui::controls::image::image(const pugi::xml_node& node) : control(0, 0, 0, 0) {
+d2_tweaks::ui::controls::image::image(menu* menu, const pugi::xml_node& node) : control(menu, 0, 0, 0, 0) {
 	const auto cname = node.attribute("name").as_string();
 	const auto cx = node.attribute("x").as_int(0);
 	const auto cy = node.attribute("y").as_int(0);

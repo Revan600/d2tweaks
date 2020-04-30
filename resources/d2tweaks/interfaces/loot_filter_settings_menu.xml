@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<interface>
+  <menu name="loot_filter_settings_menu" x="120" y="244" width="410" height="245">
+    <image name="m_bg1"
+           x="0" y="245"
+           image="data\global\UI\FrontEnd\PopUpWideNoHoles"
+           frame="0" blockClick ="true"/>
+
+    <image name="m_bg2"
+           x="256" y="245"
+           image="data\global\UI\FrontEnd\PopUpWideNoHoles"
+           frame="1" blockClick ="true"/>
+
+    <checkbox name ="m_altonly"
+              x="32" y="32"
+              frameChecked="1" frameUnchecked="0" clickSound="4"
+              popup="Show items only when ALT key is pressed"
+              text="ALT-only items"
+              color="0" font="1"
+              image="data\global\ui\PANEL\clickbox"/>
+
+    <!--=================================================-->
+
+    <group name="m_misc_group"
+           x="32"
+           y="72">
+      <checkbox name ="m_show_gold"
+                x="0" y="0"
+                frameChecked="1" frameUnchecked="0" clickSound="4"
+                popup="Show gold piles"
+                text="Show gold"
+                color="7" font="1"
+                image="data\global\ui\PANEL\clickbox"/>
+
+      <checkbox name ="m_show_runes"
+                x="0" y="20"
+                frameChecked="1" frameUnchecked="0" clickSound="4"
+                popup="Show runes"
+                text="Show runes"
+                color="11" font="1"
+                image="data\global\ui\PANEL\clickbox"/>
+
+      <checkbox name ="m_show_gems"
+                x="0" y="40"
+                frameChecked="1" frameUnchecked="0" clickSound="4"
+                popup="Show gems and skulls"
+                text="Show gems"
+                color="11" font="1"
+                image="data\global\ui\PANEL\clickbox"/>
+    </group>
+
+    <!--=================================================-->
+
+    <group name="m_qualities_group"
+           x="210"
+           y="32">
+      <checkbox name ="m_inferior"
+                x="0" y="0"
+                frameChecked="1" frameUnchecked="0" clickSound="4"
+                popup="Show low-quality items"
+                text="Inferior items"
+                color="5" font="1"
+                image="data\global\ui\PANEL\clickbox"/>
+
+      <checkbox name ="m_normal"
+                x="0" y="20"
+                frameChecked="1" frameUnchecked="0" clickSound="4"
+                popup="Show normal items"
+                text="Normal items"
+                color="0" font="1"
+                image="data\global\ui\PANEL\clickbox"/>
+
+      <checkbox name ="m_superior"
+                x="0" y="40"
+                frameChecked="1" frameUnchecked="0" clickSound="4"
+                popup="Show superior items"
+                text="Superior items"
+                color="0" font="1"
+                image="data\global\ui\PANEL\clickbox"/>
+
+      <checkbox name ="m_magic"
+                x="0" y="60"
+                frameChecked="1" frameUnchecked="0" clickSound="4"
+                popup="Show magic items"
+                text="Magic items"
+                color="3" font="1"
+                image="data\global\ui\PANEL\clickbox"/>
+
+      <checkbox name ="m_set"
+                x="0" y="80"
+                frameChecked="1" frameUnchecked="0" clickSound="4"
+                popup="Show set items"
+                text="Set items"
+                color="2" font="1"
+                image="data\global\ui\PANEL\clickbox"/>
+
+      <checkbox name ="m_rare"
+                x="0" y="100"
+                frameChecked="1" frameUnchecked="0" clickSound="4"
+                popup="Show rare items"
+                text="Rare items"
+                color="9" font="1"
+                image="data\global\ui\PANEL\clickbox"/>
+
+      <checkbox name ="m_unique"
+                x="0" y="120"
+                frameChecked="1" frameUnchecked="0" clickSound="4"
+                popup="Show unique items"
+                text="Unique items"
+                color="4" font="1"
+                image="data\global\ui\PANEL\clickbox"/>
+
+      <checkbox name ="m_crafted"
+                x="0" y="140"
+                frameChecked="1" frameUnchecked="0" clickSound="4"
+                popup="Show crafted items"
+                text="Crafted items"
+                color="8" font="1"
+                image="data\global\ui\PANEL\clickbox"/>
+
+      <checkbox name ="m_tempered"
+                x="0" y="160"
+                frameChecked="1" frameUnchecked="0" clickSound="4"
+                popup="Show tempered items"
+                text="Tempered items"
+                color="10" font="1"
+                image="data\global\ui\PANEL\clickbox"/>
+    </group>
+  </menu>
+</interface>

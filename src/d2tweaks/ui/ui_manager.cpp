@@ -27,6 +27,19 @@ void d2_tweaks::ui::ui_manager::add_menu(menu* m) {
 	m_menus.push_back(m);
 }
 
+d2_tweaks::ui::menu* d2_tweaks::ui::ui_manager::get_menu(const std::string& name) {
+	if (name.empty())
+		return nullptr;
+
+	//TODO: optimize somehow
+	for (auto menu : m_menus) {
+		if (menu->get_name() == name)
+			return menu;
+	}
+
+	return nullptr;
+}
+
 void d2_tweaks::ui::ui_manager::remove_menu(menu* m) {
 	if (m == nullptr)
 		return;
@@ -97,7 +110,6 @@ LRESULT d2_tweaks::ui::ui_manager::wnd_proc(HWND hWnd, UINT msg, WPARAM wParam, 
 
 	return g_wnd_proc_original(hWnd, msg, wParam, lParam);
 }
-
 
 void d2_tweaks::ui::ui_manager::process_inputs() {
 	if (GetAsyncKeyState(VK_LBUTTON)) {

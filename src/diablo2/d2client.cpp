@@ -16,6 +16,11 @@ diablo2::structures::unit* diablo2::d2_client::get_local_player() {
 	return get_local_player();
 }
 
+const char* diablo2::d2_client::get_local_player_name() {
+	static wrap_value<char> get_local_player_name(0x107810, get_base());
+	return get_local_player_name;
+}
+
 diablo2::structures::client_unit_list* diablo2::d2_client::get_client_unit_list() {
 	static auto unit_list = reinterpret_cast<structures::client_unit_list*>(get_base() + 0x11AA00);
 	return unit_list;

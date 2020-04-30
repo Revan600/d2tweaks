@@ -15,7 +15,7 @@
 #include <diablo2/structures/unit.h>
 #include <diablo2/structures/inventory.h>
 #include <diablo2/structures/item_data.h>
-#include <diablo2/structures/items_line.h>
+#include <diablo2/structures/data/items_line.h>
 #include <diablo2/structures/player_data.h>
 
 MODULE_INIT(autosort)

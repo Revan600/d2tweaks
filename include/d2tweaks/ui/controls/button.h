@@ -37,9 +37,9 @@ namespace d2_tweaks {
 
 				std::function<void()> m_on_click;
 			public:
-				button(const rect& rect, const std::function<void()>& onClick,
+				button(menu* menu, const rect& rect, const std::function<void()>& onClick,
 					   common::asset* image, int32_t frameDown, int32_t frameUp, int32_t clickSound = -1);
-				explicit button(const pugi::xml_node& node);
+				explicit button(menu* menu, const pugi::xml_node& node);
 				virtual ~button();
 
 				void set_x(int32_t value) override;

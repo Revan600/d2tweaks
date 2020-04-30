@@ -5,8 +5,13 @@
 
 namespace d2_tweaks {
 	namespace ui {
+		class menu;
+
 		namespace controls {
 			class control {
+				control* m_parent;
+				menu* m_menu;
+
 				std::string m_name;
 				bool m_enabled = false;
 				bool m_visible = false;
@@ -15,9 +20,28 @@ namespace d2_tweaks {
 				int32_t m_width;
 				int32_t m_height;
 			public:
-				control(int32_t x, int32_t y, int32_t w, int32_t h) : m_x(x), m_y(y), m_width(w), m_height(h) {}
+				control(menu* menu, int32_t x, int32_t y, int32_t w, int32_t h) : m_parent(nullptr),
+					m_menu(menu),
+					m_x(x), m_y(y),
+					m_width(w), m_height(h) {}
 
 				virtual ~control() = default;
+
+				control* get_parent() const {
+					return m_parent;
+				}
+
+				void set_parent(control* const parent) {
+					m_parent = parent;
+				}
+
+				menu* get_menu() const {
+					return m_menu;
+				}
+
+				void set_menu(menu* const menu) {
+					m_menu = menu;
+				}
 
 				std::string get_name() const {
 					return m_name;

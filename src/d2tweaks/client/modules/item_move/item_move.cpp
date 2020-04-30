@@ -8,7 +8,7 @@
 #include <diablo2/d2common.h>
 #include <diablo2/structures/unit.h>
 #include <diablo2/structures/item_data.h>
-#include <diablo2/structures/items_line.h>
+#include <diablo2/structures/data/items_line.h>
 #include <diablo2/structures/inventory.h>
 #include <common/hooking.h>
 

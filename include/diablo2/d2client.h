@@ -47,6 +47,7 @@ namespace diablo2 {
 		static bool is_lod();
 
 		static structures::unit* get_local_player();
+		static const char* get_local_player_name();
 		static structures::client_unit_list* get_client_unit_list();
 
 		static int32_t get_view_offset_x();

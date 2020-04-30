@@ -6,6 +6,11 @@ char* diablo2::fog::get_base() {
 	return base;
 }
 
+void diablo2::fog::get_save_path(char* buffer, size_t bufferSize) {
+	static wrap_func_fast_import<void(char*, size_t)> get_save_path(10115, get_base());
+	return get_save_path(buffer, bufferSize);
+}
+
 bool diablo2::fog::mpq_open_file(char* path, structures::file_handle** outHandle) {
 	static wrap_func_fast_import<BOOL(char*, structures::file_handle**)> mpq_open_file(10102, get_base());
 	return mpq_open_file(path, outHandle);

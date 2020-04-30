@@ -27,6 +27,16 @@ diablo2::structures::unit* diablo2::d2_game::get_player_pet(structures::game* ga
 	return get_player_pet(game, unit, type, index);
 }
 
+int32_t diablo2::d2_game::identify_item(structures::game* game, structures::unit* player, structures::unit* item) {
+	static wrap_func_fast<int32_t(structures::game*, structures::unit*, structures::unit*)> identify_item(0x19670, get_base());
+	return identify_item(game, player, item);
+}
+
+int32_t diablo2::d2_game::pickup_gold_pile(structures::game* game, structures::unit* unit, structures::unit* item) {
+	static wrap_func_fast<int32_t(structures::game*, structures::unit*, structures::unit*)> pickup_gold_pile(0x12DD0, get_base());
+	return pickup_gold_pile(game, unit, item);
+}
+
 void diablo2::d2_game::update_inventory_items(structures::game* game, structures::unit* player) {
 	static wrap_func_fast<void(structures::game*, structures::unit*, uint32_t)>update_inventory_items(0x14A90, get_base());
 	update_inventory_items(game, player, 0);

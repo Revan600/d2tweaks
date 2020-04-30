@@ -21,8 +21,8 @@ namespace d2_tweaks {
 				bool m_block_click;
 				diablo2::structures::gfxdata m_draw_info;
 			public:
-				explicit image(common::asset* image, int32_t x = 0, int32_t y = 0, int32_t frame = 0);
-				explicit image(const pugi::xml_node& node);
+				explicit image(menu* menu, common::asset* image, int32_t x = 0, int32_t y = 0, int32_t frame = 0);
+				explicit image(menu* menu, const pugi::xml_node& node);
 
 				void set_frame(int32_t frame) {
 					m_frame = static_cast<uint32_t>(frame);

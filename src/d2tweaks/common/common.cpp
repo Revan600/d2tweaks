@@ -71,6 +71,11 @@ bool d2_tweaks::common::common::get_packet_size_cs(packet_header* packet, size_t
 			size = sizeof damage_info_cs;
 			return true;
 		}
+		case MESSAGE_TYPE_GOLD_PICKUP_INFO:
+		{
+			size = sizeof gold_pickup_info_sc;
+			return true;
+		}
 		default:
 			return false;
 	}
@@ -91,6 +96,11 @@ bool d2_tweaks::common::common::get_packet_size_sc(packet_header* packet, size_t
 		case MESSAGE_TYPE_DAMAGE_INFO:
 		{
 			size = sizeof damage_info_sc;
+			return true;
+		}
+		case MESSAGE_TYPE_GOLD_PICKUP_INFO:
+		{
+			size = sizeof gold_pickup_info_sc;
 			return true;
 		}
 		default:

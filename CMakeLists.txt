@@ -61,5 +61,13 @@ set_target_properties(pugixml PROPERTIES
 )
 target_link_libraries(d2tweaks PRIVATE pugixml)
 
+#json
+find_package(nlohmann_json CONFIG REQUIRED)
+set_target_properties(nlohmann_json PROPERTIES
+	MAP_IMPORTED_CONFIG_MINSIZEREL Release
+	MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release
+)
+target_link_libraries(d2tweaks PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
+
 set_target_properties(d2tweaks PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${D2_BASE_DIR}/MODS/test/)
 #set_target_properties(d2tweaks PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${D2_BASE_DIR}/MODS/Zy-El\ v.4.5.1/)

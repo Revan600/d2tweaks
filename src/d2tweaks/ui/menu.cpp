@@ -12,6 +12,7 @@
 #include <d2tweaks/ui/controls/image.h>
 #include <d2tweaks/ui/controls/label.h>
 #include <d2tweaks/ui/controls/checkbox.h>
+#include <d2tweaks/ui/controls/group.h>
 
 d2_tweaks::ui::menu::menu() : m_x(0), m_y(0), m_width(0), m_height(0) {}
 
@@ -34,25 +35,38 @@ bool d2_tweaks::ui::menu::load_xml(const std::string& path) {
 
 	const auto menuNode = root.first();
 
+	m_name = menuNode.node().attribute("name").as_string();
 	m_x = menuNode.node().attribute("x").as_int(0);
 	m_y = menuNode.node().attribute("y").as_int(0);
 	m_width = menuNode.node().attribute("width").as_int(-1);
 	m_height = menuNode.node().attribute("height").as_int(-1);
 
-	for (auto node : menuNode.node().children("button")) {
-		add_control(new controls::button(node));
-	}
+	for (auto child : menuNode.node().children()) {
+		const auto name = child.name();
 
-	for (auto node : menuNode.node().children("image")) {
-		add_control(new controls::image(node));
-	}
+		if (strcmp(name, "button") == 0) {
+			add_control(new controls::button(this, child));
+			continue;
+		}
 
-	for (auto node : menuNode.node().children("label")) {
-		add_control(new controls::label(node));
-	}
+		if (strcmp(name, "checkbox") == 0) {
+			add_control(new controls::checkbox(this, child));
+			continue;
+		}
 
-	for (auto node : menuNode.node().children("checkbox")) {
-		add_control(new controls::checkbox(node));
+		if (strcmp(name, "group") == 0) {
+			add_control(new controls::group(this, child));
+			continue;
+		}
+
+		if (strcmp(name, "image") == 0) {
+			add_control(new controls::image(this, child));
+			continue;
+		}
+
+		if (strcmp(name, "label") == 0) {
+			add_control(new controls::label(this, child));
+		}
 	}
 
 	if (m_width == -1) {
@@ -88,15 +102,6 @@ void d2_tweaks::ui::menu::add_control(controls::control* control) {
 	m_controls.push_back(control);
 }
 
-//d2_tweaks::ui::controls::control* d2_tweaks::ui::menu::get_control(const std::string& name) {
-//	const auto it = m_named_controls.find(name);
-//
-//	if (it == m_named_controls.end())
-//		return nullptr;
-//
-//	return it->second;
-//}
-
 void d2_tweaks::ui::menu::remove_control(controls::control* control) {
 	if (control == nullptr)
 		return;
@@ -106,7 +111,7 @@ void d2_tweaks::ui::menu::remove_control(controls::control* control) {
 
 void d2_tweaks::ui::menu::draw() {
 	for (auto control : m_controls) {
-		if (!control->get_visible())
+		if (!control->get_visible() || control->get_parent() != nullptr)
 			continue;
 
 		control->draw(m_x, m_y);
@@ -117,7 +122,7 @@ bool d2_tweaks::ui::menu::left_mouse(bool up) {
 	auto block = false;
 
 	for (auto control : m_controls) {
-		if (!control->get_enabled())
+		if (!control->get_enabled() || control->get_parent() != nullptr)
 			continue;
 
 		auto tblock = false;
@@ -132,7 +137,7 @@ bool d2_tweaks::ui::menu::right_mouse(bool up) {
 	auto block = false;
 
 	for (auto control : m_controls) {
-		if (!control->get_enabled())
+		if (!control->get_enabled() || control->get_parent() != nullptr)
 			continue;
 
 		auto tblock = false;
@@ -147,7 +152,7 @@ bool d2_tweaks::ui::menu::key_event(uint32_t key, bool up) {
 	auto block = false;
 
 	for (auto control : m_controls) {
-		if (!control->get_enabled())
+		if (!control->get_enabled() || control->get_parent() != nullptr)
 			continue;
 
 		auto tblock = false;

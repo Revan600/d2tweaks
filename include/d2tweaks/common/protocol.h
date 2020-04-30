@@ -9,6 +9,7 @@ namespace d2_tweaks {
 			MESSAGE_TYPE_ITEM_MOVE,
 			MESSAGE_TYPE_INVENTORY_SORT,
 			MESSAGE_TYPE_DAMAGE_INFO,
+			MESSAGE_TYPE_GOLD_PICKUP_INFO,
 
 			MESSAGE_TYPE_COUNT
 		};
@@ -88,6 +89,14 @@ namespace d2_tweaks {
 
 			damage_info_sc() : unit_type(0), guid(0), damage_type(DAMAGE_TYPE_UNKNOWN), damage(0) {
 				message_type = MESSAGE_TYPE_DAMAGE_INFO;
+			}
+		};
+
+		struct gold_pickup_info_sc : packet_header {
+			uint32_t gold;
+
+			gold_pickup_info_sc() : gold(0) {
+				message_type = MESSAGE_TYPE_GOLD_PICKUP_INFO;
 			}
 		};
 #pragma pack(pop)

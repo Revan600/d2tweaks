@@ -5,6 +5,7 @@
 #include <fw/singleton.h>
 
 #include <vector>
+#include <string>
 
 namespace d2_tweaks {
 	namespace ui {
@@ -21,6 +22,7 @@ namespace d2_tweaks {
 			explicit ui_manager(token);
 
 			void add_menu(menu* m);
+			menu* get_menu(const std::string& name);
 			void remove_menu(menu* m);
 
 			void draw();

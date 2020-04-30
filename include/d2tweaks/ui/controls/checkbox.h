@@ -34,9 +34,9 @@ namespace d2_tweaks {
 
 				std::function<void(bool)> m_on_click;
 			public:
-				checkbox(const std::wstring& text, const rect& rect, const std::function<void()>& onClick,
+				explicit checkbox(menu* menu, const std::wstring& text, const rect& rect, const std::function<void()>& onClick,
 						 common::asset* image, int32_t frameChecked, int32_t frameUnchecked, int32_t clickSound = -1);
-				explicit checkbox(const pugi::xml_node& node);
+				explicit checkbox(menu* menu, const pugi::xml_node& node);
 
 				void set_x(int32_t value) override;
 				int32_t get_x() const override {
@@ -66,6 +66,10 @@ namespace d2_tweaks {
 
 				bool get_state() const {
 					return m_state;
+				}
+
+				void set_state(bool value) {
+					m_state = value;
 				}
 
 				void draw() override;

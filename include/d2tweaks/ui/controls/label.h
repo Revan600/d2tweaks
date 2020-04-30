@@ -15,10 +15,10 @@ namespace d2_tweaks {
 				diablo2::ui_color_t m_color;
 				diablo2::ui_font_t m_font;
 			public:
-				explicit label(const std::wstring& text, int32_t x = 0, int32_t y = 0,
+				explicit label(menu* menu, const std::wstring& text, int32_t x = 0, int32_t y = 0,
 							   diablo2::ui_color_t color = diablo2::UI_COLOR_WHITE,
 							   diablo2::ui_font_t font = diablo2::UI_FONT_16);
-				explicit label(const pugi::xml_node& node);
+				explicit label(menu* menu, const pugi::xml_node& node);
 
 				void set_text(const std::wstring& text) {
 					m_text = text;

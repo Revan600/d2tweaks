@@ -54,6 +54,16 @@ diablo2::structures::items_line* diablo2::d2_common::get_item_record(uint32_t gu
 	return get_item_record(guid);
 }
 
+diablo2::structures::item_types_line* diablo2::d2_common::get_item_type_record(uint32_t typeId) {
+	static wrap_func_fast<structures::item_types_line * (uint32_t)>get_item_type_record(0x2B1A0, get_base());
+	return get_item_type_record(typeId);
+}
+
+uint32_t diablo2::d2_common::get_maximum_character_gold(structures::unit* player) {
+	static wrap_func_std_import<uint32_t(structures::unit*)> get_maximum_character_gold(10439, get_base());
+	return get_maximum_character_gold(player);
+}
+
 int32_t diablo2::d2_common::set_stat(structures::unit* unit, unit_stats_t stat, uint32_t value, int16_t param) {
 	static wrap_func_std_import<int32_t(structures::unit*, int32_t, int32_t, int32_t)> set_stat(10517, get_base());
 	return set_stat(unit, stat, value, param);
@@ -79,6 +89,11 @@ int32_t diablo2::d2_common::_10116(int32_t x1, int32_t y1, int32_t* x, int32_t* 
 	return get_unk_coords2(x1, y1, x, y);
 }
 
+diablo2::structures::room* diablo2::d2_common::get_room_from_unit(structures::unit* unit) {
+	static wrap_func_std_import<structures::room * (structures::unit*)> get_room_from_unit(10342, get_base());
+	return get_room_from_unit(unit);
+}
+
 int32_t diablo2::d2_common::get_unit_size_x(structures::unit* unit) {
 	static wrap_func_std_import<int32_t(structures::unit*)> get_unit_size_x(10336, get_base());
 	return get_unit_size_x(unit);
@@ -87,6 +102,11 @@ int32_t diablo2::d2_common::get_unit_size_x(structures::unit* unit) {
 int32_t diablo2::d2_common::get_unit_size_y(structures::unit* unit) {
 	static wrap_func_std_import<int32_t(structures::unit*)> get_unit_size_y(10337, get_base());
 	return get_unit_size_y(unit);
+}
+
+int32_t diablo2::d2_common::get_distance_between_units(structures::unit* unit1, structures::unit* unit2) {
+	static wrap_func_std_import<int32_t(structures::unit*, structures::unit*)> get_distance_between_units(10397, get_base());
+	return get_distance_between_units(unit1, unit2);
 }
 
 int32_t diablo2::d2_common::get_unit_x(structures::path* path) {

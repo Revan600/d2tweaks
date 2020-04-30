@@ -7,64 +7,13 @@
 // Size of each memory block. (= page size of VirtualAlloc)
 const size_t MEMORY_BLOCK_SIZE = 0x1000;
 
-// Max range for seeking a memory block. (= 1024MB)
-const size_t MAX_MEMORY_RANGE = 0x40000000;
-
-static void* find_prev_free_region(void* address,
-								   void* minAddr,
-								   uint32_t allocationGranularity) {
-	auto try_addr = reinterpret_cast<ULONG_PTR>(address);
-
-	// Round down to the next allocation granularity.
-	try_addr -= try_addr % allocationGranularity;
-
-	// Start from the previous allocation granularity multiply.
-	try_addr -= allocationGranularity;
-
-	while (try_addr >= reinterpret_cast<ULONG_PTR>(minAddr)) {
-		MEMORY_BASIC_INFORMATION mbi;
-		if (VirtualQuery(reinterpret_cast<LPVOID>(try_addr), &mbi, sizeof(MEMORY_BASIC_INFORMATION)) ==
-			0)
-			break;
-
-		if (mbi.State == MEM_FREE)
-			return reinterpret_cast<LPVOID>(try_addr);
-
-		if (reinterpret_cast<ULONG_PTR>(mbi.AllocationBase) < allocationGranularity)
-			break;
-
-		try_addr = reinterpret_cast<ULONG_PTR>(mbi.AllocationBase) - allocationGranularity;
-	}
-
-	return nullptr;
-}
-
 static void* allocate_function_stub(void* origin, void* ptr, size_t size) {
 	static void* current_stub = nullptr;
 
 	if (!current_stub) {
-		SYSTEM_INFO si;
-		GetSystemInfo(&si);
-		auto min_addr = reinterpret_cast<uintptr_t>(si.lpMinimumApplicationAddress);
-
-		if (reinterpret_cast<uintptr_t>(origin) > MAX_MEMORY_RANGE&&
-			min_addr < reinterpret_cast<uintptr_t>(origin) - MAX_MEMORY_RANGE)
-			min_addr = reinterpret_cast<uintptr_t>(origin) - MAX_MEMORY_RANGE;
-
-		auto p_alloc = origin;
-
-		while (reinterpret_cast<uintptr_t>(p_alloc) >= min_addr) {
-			p_alloc = find_prev_free_region(p_alloc, reinterpret_cast<LPVOID>(min_addr),
-											si.dwAllocationGranularity);
-			if (p_alloc == nullptr)
-				break;
-
-			current_stub =
-				VirtualAlloc(p_alloc, MEMORY_BLOCK_SIZE, MEM_COMMIT | MEM_RESERVE,
-							 PAGE_EXECUTE_READWRITE);
-			if (current_stub != nullptr)
-				break;
-		}
+		current_stub =
+			VirtualAlloc(nullptr, MEMORY_BLOCK_SIZE, MEM_COMMIT | MEM_RESERVE,
+						 PAGE_EXECUTE_READWRITE);
 	}
 
 	if (!current_stub)
@@ -87,7 +36,7 @@ static void* allocate_function_stub(void* origin, void* ptr, size_t size) {
 	return code;
 }
 
-hooking::mh_status_t hooking::hook(void* target, void* detour, void** original) {
+hooking::mh_status_t hooking::details::hook(void* target, void* detour, void** original) {
 	return static_cast<mh_status_t>(MH_CreateHook(target, detour, original));
 }
 

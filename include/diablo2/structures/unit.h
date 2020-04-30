@@ -184,68 +184,6 @@ namespace diablo2 {
 				return (flags.unit_flags & 0x80000000) == 0x80000000;
 			}
 		};
-
-		//struct unit {										//Offset from Code.		Size: 0xF4+4
-		//	uint32_t		unit_type;				//+00
-		//	union {
-		//		uint32_t			player_class;
-		//		uint32_t			txt_file_no;
-		//	};									//+04
-		//	uint32_t		unit_id;				//+08
-		//	uint32_t		item_num;				//+0C
-		//	uint32_t		current_anim;			//+10
-		//	union {
-		//		monster_data* monster_data;
-		//		object_data* object_data;
-		//		item_data* item_data;
-		//		player_data* player_data;
-		//	};									//+14
-		//	uint8_t		act;					//+18
-		//	uint8_t		uk12[3];				//+19
-		//	void* pt_act;					//+1C
-		//	uint32_t		seed_low;				//+20
-		//	uint32_t		seed_hi;					//+24
-		//	uint32_t		seed_starting;			//+28
-		//	path* path;					//+2C
-		//	uint8_t		uk1[0x08];				//+30
-		//	structures::path* pt_pos;					//+38
-		//	uint32_t		anim_speed;				//+3C
-		//	uint8_t		uk2[0x04];				//+40
-		//	uint32_t		cur_frame;				//+44
-		//	uint32_t		remaining_frame;			//+48
-		//	uint16_t		anim_speed_w;				//+4C
-		//	uint8_t		action_flag;				//+4E
-		//	uint8_t		uk3[0x1];				//+4F
-		//	void* pt_anim_data;				//+50
-		//	uint8_t		uk4[0x08];				//+54
-		//	stats* stats;				//+5C
-		//	inventory* inventory;		    //+60
-		//	uint8_t		uk5[0x1C];				//+64
-		//	game* game;					//+80
-		//	uint8_t		uk6[0x24];				//+84
-		//	skills* skills;				//+A8
-		//	void* pt_combat_data;			//+AC
-		//	uint8_t		uk7[0x08];				//+B0
-		//	uint32_t		item_code;				//+B8 for an item being dropped by this unit
-		//	uint8_t		uk8[0x08];				//+BC
-		//	uint32_t		flags1;					//+C4
-		//	union {
-		//		uint32_t		flags2;				//+C8	//flags
-		//		struct {
-		//			uint32_t	ukf1 : 25;
-		//			uint32_t	is_lod : 1;
-		//		};
-		//	};
-		//	uint8_t		uk9[0x04];				//+CC
-		//	uint32_t		client_id;				//+D0
-		//	uint8_t		uk10[0x0C];				//+D4
-		//	unit* pt_first_monster;			//+E0
-		//	unit* unit1;					//+E4
-		//	unit* unit2;					//+E8
-		//	uint8_t		uk11[0x08];				//+EC
-		//};
-
-
 	}
 }
 

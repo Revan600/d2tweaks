@@ -11,4 +11,5 @@ bool d2_tweaks::server::modules::server_module::handle_packet(diablo2::structure
 	return false;
 }
 
-void d2_tweaks::server::modules::server_module::tick() {}
+void d2_tweaks::server::modules::server_module::tick(diablo2::structures::game* game,
+													 diablo2::structures::unit* unit) {}

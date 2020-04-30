@@ -8,10 +8,11 @@
 
 const int32_t PADDING = 3;
 
-d2_tweaks::ui::controls::checkbox::checkbox(const std::wstring& text, const rect& rect,
+d2_tweaks::ui::controls::checkbox::checkbox(menu* menu, const std::wstring& text, const rect& rect,
 											const std::function<void()>& onClick,
 											common::asset* image, int32_t frameChecked, int32_t frameUnchecked, int32_t clickSound)
-	: control(rect.get_x(),
+	: control(menu,
+			  rect.get_x(),
 			  rect.get_y(),
 			  rect.get_width(),
 			  rect.get_height()) {
@@ -23,8 +24,8 @@ d2_tweaks::ui::controls::checkbox::checkbox(const std::wstring& text, const rect
 
 	m_rect = rect;
 
-	m_image = new controls::image(image, rect.get_x(), rect.get_y(), frameUnchecked);
-	m_label = new label(text, rect.get_x() + m_image->get_width() + PADDING, m_rect.get_y());
+	m_image = new controls::image(menu, image, rect.get_x(), rect.get_y(), frameUnchecked);
+	m_label = new label(menu, text, rect.get_x() + m_image->get_width() + PADDING, m_rect.get_y());
 
 	m_frame_checked = frameChecked;
 	m_frame_unchecked = frameUnchecked;
@@ -35,7 +36,7 @@ d2_tweaks::ui::controls::checkbox::checkbox(const std::wstring& text, const rect
 	m_state = false;
 }
 
-d2_tweaks::ui::controls::checkbox::checkbox(const pugi::xml_node& node) : control(0, 0, 0, 0) {
+d2_tweaks::ui::controls::checkbox::checkbox(menu* menu, const pugi::xml_node& node) : control(menu, 0, 0, 0, 0) {
 	control::set_enabled(true);
 	control::set_visible(true);
 
@@ -69,8 +70,8 @@ d2_tweaks::ui::controls::checkbox::checkbox(const pugi::xml_node& node) : contro
 	m_is_down = false;
 	m_state = false;
 
-	m_image = new image(cimg, cx, cy, m_frame_unchecked);
-	m_label = new label(string_utils::string_to_wstring(ctext), cx + m_image->get_width() + PADDING, cy,
+	m_image = new image(menu, cimg, cx, cy, m_frame_unchecked);
+	m_label = new label(menu, string_utils::string_to_wstring(ctext), cx + m_image->get_width() + PADDING, cy,
 						static_cast<diablo2::ui_color_t>(ccolor), static_cast<diablo2::ui_font_t>(cfont));
 
 	checkbox::set_x(cx);

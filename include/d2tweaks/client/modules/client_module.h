@@ -17,6 +17,7 @@ namespace d2_tweaks {
 				client_module();
 
 				virtual void init() = 0;
+				virtual void draw_ui();
 				virtual void tick();
 				virtual void handle_packet(common::packet_header* packet);
 			};

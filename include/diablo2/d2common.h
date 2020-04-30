@@ -8,8 +8,10 @@ namespace diablo2 {
 		struct unit;
 		struct path;
 		struct inventory;
+		struct room;
 
 		struct items_line;
+		struct item_types_line;
 	}
 
 	enum unit_stats_t {
@@ -333,6 +335,9 @@ namespace diablo2 {
 		static BOOL inv_update_item(structures::inventory* inv, structures::unit* item, BOOL isClient);
 
 		static structures::items_line* get_item_record(uint32_t guid);
+		static structures::item_types_line* get_item_type_record(uint32_t typeId);
+
+		static uint32_t get_maximum_character_gold(structures::unit* player);
 
 		static int32_t set_stat(structures::unit* unit, unit_stats_t stat, uint32_t value, int16_t param);
 		static int32_t get_stat(structures::unit* unit, unit_stats_t stat, int16_t param);
@@ -341,9 +346,13 @@ namespace diablo2 {
 		static int32_t _10111(int32_t* x, int32_t* y);
 		static int32_t _10116(int32_t x1, int32_t y1, int32_t* x, int32_t* y);
 
+		static structures::room* get_room_from_unit(structures::unit* unit);
+
 		static int32_t get_unit_size_x(structures::unit* unit);
 		static int32_t get_unit_size_y(structures::unit* unit);
-		
+
+		static int32_t get_distance_between_units(structures::unit* unit1, structures::unit* unit2);
+
 		static int32_t get_unit_x(structures::path* path);
 		static int32_t get_unit_y(structures::path* path);
 		static int32_t get_unit_precise_x(structures::unit* unit);

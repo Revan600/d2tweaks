@@ -31,7 +31,7 @@ namespace d2_tweaks {
 				 * \return true - block further packet processing, false - pass packet to game
 				 */
 				virtual bool handle_packet(diablo2::structures::game* game, diablo2::structures::unit* player, common::packet_header* packet);
-				virtual void tick();
+				virtual void tick(diablo2::structures::game* game, diablo2::structures::unit* unit);
 			};
 		}
 	}

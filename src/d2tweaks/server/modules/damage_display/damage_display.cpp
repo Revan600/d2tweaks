@@ -6,6 +6,7 @@
 #include <diablo2/structures/damage.h>
 #include <diablo2/structures/unit.h>
 #include <diablo2/structures/player_data.h>
+#include <diablo2/structures/monster_data.h>
 #include <diablo2/structures/net_client.h>
 #include <common/hooking.h>
 #include <diablo2/d2common.h>
@@ -58,6 +59,9 @@ static void send_damage_data(diablo2::structures::unit* defender,
 	if (dmg->dmg_total <= 0)
 		return;
 
+	auto currentHp = diablo2::d2_common::get_stat(defender, diablo2::UNIT_STAT_HITPOINTS, 0);
+	auto maxHp = diablo2::d2_common::get_stat(defender, diablo2::UNIT_STAT_MAXHP, 0);
+
 	packet.unit_type = static_cast<uint8_t>(defender->type);
 	packet.guid = defender->guid;
 	packet.damage_type = get_damage_type(dmg);
@@ -98,9 +102,9 @@ static diablo2::structures::unit* get_hireling_owner(diablo2::structures::game* 
 	auto guid = diablo2::d2_common::get_stat(unit, diablo2::UNIT_STAT_UNUSED212, 0);
 
 	if (guid != 0)
-		return instance.get_server_unit(game, guid, 0x00);
+		return instance.get_server_unit(game, guid, diablo2::structures::unit_type_t::UNIT_TYPE_PLAYER);
 
-	instance.iterate_server_units(game, 0x00, [&](diablo2::structures::unit* player) {
+	instance.iterate_server_units(game, diablo2::structures::unit_type_t::UNIT_TYPE_PLAYER, [&](diablo2::structures::unit* player) {
 		const auto pet = diablo2::d2_game::get_player_pet(game, player, 7, 0);
 
 		if (pet == unit) {
@@ -116,7 +120,7 @@ static diablo2::structures::unit* get_hireling_owner(diablo2::structures::game* 
 
 	diablo2::d2_common::set_stat(unit, diablo2::UNIT_STAT_UNUSED212, guid, 0);
 
-	return instance.get_server_unit(game, guid, 0x00);
+	return instance.get_server_unit(game, guid, diablo2::structures::unit_type_t::UNIT_TYPE_PLAYER);
 }
 
 static diablo2::structures::unit* get_pet_owner(diablo2::structures::game* game,
@@ -129,9 +133,9 @@ static diablo2::structures::unit* get_pet_owner(diablo2::structures::game* game,
 	auto guid = diablo2::d2_common::get_stat(unit, diablo2::UNIT_STAT_UNUSED212, 0);
 
 	if (guid != 0)
-		return instance.get_server_unit(game, guid, 0x00);
+		return instance.get_server_unit(game, guid, diablo2::structures::unit_type_t::UNIT_TYPE_PLAYER);
 
-	instance.iterate_server_units(game, 0x00, [&](diablo2::structures::unit* player) {
+	instance.iterate_server_units(game, diablo2::structures::unit_type_t::UNIT_TYPE_PLAYER, [&](diablo2::structures::unit* player) {
 		diablo2::d2_game::iterate_unit_pets(
 			game, player, [&](diablo2::structures::game*, diablo2::structures::unit*, diablo2::structures::unit* u) {
 			if (u != unit)
@@ -148,7 +152,7 @@ static diablo2::structures::unit* get_pet_owner(diablo2::structures::game* game,
 
 	diablo2::d2_common::set_stat(unit, diablo2::UNIT_STAT_UNUSED212, guid, 0);
 
-	return instance.get_server_unit(game, guid, 0x00);
+	return instance.get_server_unit(game, guid, diablo2::structures::unit_type_t::UNIT_TYPE_PLAYER);
 }
 
 static void process_players_damage(diablo2::structures::unit* attacker,
@@ -238,4 +242,4 @@ bool d2_tweaks::server::modules::damage_display::handle_packet(diablo2::structur
 	return true;
 }
 
-void d2_tweaks::server::modules::damage_display::tick() {}
+void d2_tweaks::server::modules::damage_display::tick(diablo2::structures::game* game, diablo2::structures::unit* unit) {}

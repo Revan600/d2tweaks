@@ -12,6 +12,8 @@ namespace diablo2 {
 	public:
 		static char* get_base();
 
+		static void get_save_path(char* buffer, size_t bufferSize);
+
 		static bool mpq_open_file(char* path, structures::file_handle** outHandle);
 		static bool mpq_close_file(structures::file_handle* handle);
 		static bool mpq_read_file(structures::file_handle* handle, void* buffer, size_t size, size_t* bytesToRead);

@@ -23,7 +23,7 @@ bool d2_tweaks::server::modules::item_move::handle_packet(diablo2::structures::g
 	static auto& instance = singleton<server>::instance();
 
 	const auto itemMove = static_cast<common::item_move_cs*>(packet);
-	const auto item = instance.get_server_unit(game, itemMove->item_guid, 0x4); //0x4 = item
+	const auto item = instance.get_server_unit(game, itemMove->item_guid, diablo2::structures::unit_type_t::UNIT_TYPE_ITEM); //0x4 = item
 
 	if (item == nullptr)
 		return true; //block further packet processing

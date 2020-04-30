@@ -8,9 +8,11 @@
 #include <d2tweaks/common/asset_manager.h>
 #include <common/string_utils.h>
 
-d2_tweaks::ui::controls::button::button(const rect& rect, const std::function<void()>& onClick,
+d2_tweaks::ui::controls::button::button(menu* menu,
+										const rect& rect, const std::function<void()>& onClick,
 										common::asset* image,
-										int32_t frameDown, int32_t frameUp, int32_t clickSound) : control(rect.get_x(),
+										int32_t frameDown, int32_t frameUp, int32_t clickSound) : control(menu,
+																										  rect.get_x(),
 																										  rect.get_y(),
 																										  rect.get_width(),
 																										  rect.get_height()) {
@@ -21,7 +23,7 @@ d2_tweaks::ui::controls::button::button(const rect& rect, const std::function<vo
 	set_y(rect.get_y());
 
 	m_rect = rect;
-	m_image = new controls::image(image, m_rect.get_x(), m_rect.get_y(), frameUp);
+	m_image = new controls::image(menu, image, m_rect.get_x(), m_rect.get_y(), frameUp);
 	m_frame_down = frameDown;
 	m_frame_up = frameUp;
 	m_click_sound = clickSound;
@@ -32,7 +34,7 @@ d2_tweaks::ui::controls::button::button(const rect& rect, const std::function<vo
 	m_on_click = onClick;
 }
 
-d2_tweaks::ui::controls::button::button(const pugi::xml_node& node) : control(0, 0, 0, 0) {
+d2_tweaks::ui::controls::button::button(menu* menu, const pugi::xml_node& node) : control(menu, 0, 0, 0, 0) {
 	const auto cname = node.attribute("name").as_string();
 	const auto cx = node.attribute("x").as_int(0);
 	const auto cy = node.attribute("y").as_int(0);
@@ -57,7 +59,7 @@ d2_tweaks::ui::controls::button::button(const pugi::xml_node& node) : control(0,
 	control::set_visible(true);
 
 	m_rect = rect(cx, cy, cw, ch);
-	m_image = new image(cimg, m_rect.get_x(), m_rect.get_y(), frameUp);
+	m_image = new image(menu, cimg, m_rect.get_x(), m_rect.get_y(), frameUp);
 	m_frame_down = frameDown;
 	m_frame_up = frameUp;
 	m_click_sound = clickSound;

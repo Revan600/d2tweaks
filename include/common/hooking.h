@@ -1,4 +1,6 @@
 #pragma once
+
+#include <Windows.h>
 #include <cstdint>
 
 namespace hooking {
@@ -48,7 +50,23 @@ namespace hooking {
 		MH_ERROR_FUNCTION_NOT_FOUND
 	};
 
-	mh_status_t hook(void* target, void* detour, void** original);
+	namespace details {
+		mh_status_t hook(void* target, void* detour, void** original);
+	}
+
+	template<typename TOrig>
+	mh_status_t hook(void* target, void* detour, TOrig** original) {
+		return details::hook(target, detour, reinterpret_cast<void**>(original));
+	}
+
+	template<size_t TOrdinal, typename TOrig>
+	mh_status_t hook(void* base, void* detour, TOrig** original) {
+		auto fn = GetProcAddress(reinterpret_cast<HMODULE>(base),
+								 reinterpret_cast<LPCSTR>(TOrdinal));
+
+		return hook(fn, detour, original);
+	}
+
 	intptr_t get_executable_memory(void* origin, size_t size);
 	void* set_call(void* address, void* function, size_t stubSize = 7);
 	void* set_jmp(void* address, void* function, size_t stubSize = 7);
